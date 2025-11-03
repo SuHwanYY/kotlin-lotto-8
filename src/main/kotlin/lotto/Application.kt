@@ -3,48 +3,26 @@ package lotto
 import camp.nextstep.edu.missionutils.Console
 
 fun main() {
-    // TODO: 프로그램 구현
+    // 구입 금액 입력 (잘못 입력하면 [ERROR] 출력 후 금액부터 다시 받기)
     println("구입금액을 입력해 주세요.")
+    val amount = readAmountWithRetry()
 
-    // 검증
-    val amount = try {
-        val raw = Console.readLine()
-        PurchaseValidator.validate(raw)
-    } catch (e: IllegalArgumentException) {
-        // [ERROR]가 출력되어야 하고, 예외가 발생해야 함
-        println(e.message)
-        throw e
-    }
-
+    // 로또 발행
     val count = PurchaseValidator.toCount(amount)
     println()
     println("${count}개를 구매했습니다.")
-
-    // 로또 발행 및 출력
     val tickets = LottoGenerator.createTickets(count)
     tickets.forEach { println(it.values()) }
 
-    // 당첨 번호 입력
+    // 당첨 번호 입력 (잘못 입력하면 [ERROR] 출력 후 당첨 번호부터 다시 받기)
     println("\n당첨 번호를 입력해 주세요.")
-    val winningNumbers = try {
-        val rawWinning = Console.readLine()
-        WinNumValidator.parseWinningNumbers(rawWinning)
-    } catch (e: IllegalArgumentException) {
-        println(e.message)
-        throw e
-    }
+    val winningNumbers = readWinningNumbersWithRetry()
 
-    // 보너스 번호 입력
+    // 보너스 번호 입력 (잘못 입력하면 [ERROR] 출력 후 보너스 번호부터 다시 받기)
     println("\n보너스 번호를 입력해 주세요.")
-    val bonusNumber = try {
-        val rawBonus = Console.readLine()
-        WinNumValidator.parseBonusNumber(rawBonus, winningNumbers)
-    } catch (e: IllegalArgumentException) {
-        println(e.message)
-        throw e
-    }
+    val bonusNumber = readBonusNumberWithRetry(winningNumbers)
 
-    // 당첨 결과 출력
+    // 당첨 통계/수익률 출력
     val result = ResultCalculator.evaluate(tickets, winningNumbers, bonusNumber)
 
     println("\n당첨 통계")
@@ -55,7 +33,51 @@ fun main() {
     println("5개 일치, 보너스 볼 일치 (${ResultCalculator.formatPrize(Rank.SECOND.prize)}) - ${result[Rank.SECOND]}개")
     println("6개 일치 (${ResultCalculator.formatPrize(Rank.FIRST.prize)}) - ${result[Rank.FIRST]}개")
 
-    // 최종 수익률 계산 및 출력
     val earningRate = ResultCalculator.calculateEarningsRate(result, amount)
     println("총 수익률은 ${earningRate}%입니다.")
+}
+
+// 금액 입력 재시도
+private fun readAmountWithRetry(): Int {
+    while (true) {
+        try {
+            val raw = Console.readLine()
+            return PurchaseValidator.validate(raw)
+        } catch (e: IllegalArgumentException) {
+            println(ensureErrorPrefix(e.message))
+            // 금액부터 다시 입력
+        }
+    }
+}
+
+// 당첨 번호 입력 재시도
+private fun readWinningNumbersWithRetry(): List<Int> {
+    while (true) {
+        try {
+            val raw = Console.readLine()
+            return WinNumValidator.parseWinningNumbers(raw)
+        } catch (e: IllegalArgumentException) {
+            println(ensureErrorPrefix(e.message))
+            // 당첨 번호부터 다시 입력
+        }
+    }
+}
+
+// 보너스 번호 입력 재시도
+private fun readBonusNumberWithRetry(winningNumbers: List<Int>): Int {
+    while (true) {
+        try {
+            val raw = Console.readLine()
+            return WinNumValidator.parseBonusNumber(raw, winningNumbers)
+        } catch (e: IllegalArgumentException) {
+            println(ensureErrorPrefix(e.message))
+            // 보너스 번호부터 다시 입력
+        }
+    }
+}
+
+// 메시지가 [ERROR]로 시작하도록 보정
+private fun ensureErrorPrefix(msg: String?): String {
+    val core = msg?.removePrefix("[ERROR]")?.trim().orEmpty()
+    return if (core.isEmpty()) "[ERROR] 잘못된 입력입니다." else "[ERROR] $core"
 }
