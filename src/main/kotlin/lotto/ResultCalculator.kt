@@ -25,4 +25,15 @@ internal object ResultCalculator {
     }
 
     fun formatPrize(n: Long): String = "%,d".format(n) + "원"
+
+    fun calculateEarningsRate(result: Map<Rank, Int>, purchaseAmount: Int): Double {
+        val totalPrize = result.entries.sumOf { (rank, count) ->
+            rank.prize * count
+        }
+
+        if (purchaseAmount == 0) return 0.0
+
+        val rate = totalPrize.toDouble() / purchaseAmount * 100
+        return (rate * 10).toInt() / 10.0  // 소수점 둘째 자리에서 반올림
+    }
 }

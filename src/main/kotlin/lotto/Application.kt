@@ -54,4 +54,7 @@ fun main() {
     println("5개 일치, 보너스 볼 일치 (${ResultCalculator.formatPrize(Rank.SECOND.prize)}) - ${result[Rank.SECOND]}개")
     println("6개 일치 (${ResultCalculator.formatPrize(Rank.FIRST.prize)}) - ${result[Rank.FIRST]}개")
 
+    // 최종 수익률 계산 및 출력
+    val earningRate = ResultCalculator.calculateEarningsRate(result, amount)
+    println("총 수익률은 ${earningRate}%입니다.")
 }
