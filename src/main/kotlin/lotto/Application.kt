@@ -15,11 +15,33 @@ fun main() {
         throw e
     }
 
-    // 개수 출력 (다음 단계에서 실제 발행 붙일 예정)
     val count = PurchaseValidator.toCount(amount)
-    println("${count}개를 구매했습니다.")
 
     // 로또 발행 및 출력
     val tickets = LottoGenerator.createTickets(count)
     tickets.forEach { println(it.values()) }
+
+    println("\n당첨 번호를 입력해 주세요.")
+    val winningNumbers = try {
+        val rawWinning = Console.readLine()
+        WinNumValidator.parseWinningNumbers(rawWinning)
+    } catch (e: IllegalArgumentException) {
+        println(e.message)
+        throw e
+    }
+
+    // --- 보너스 번호 입력 ---
+    println("\n보너스 번호를 입력해 주세요.")
+    val bonusNumber = try {
+        val rawBonus = Console.readLine()
+        WinNumValidator.parseBonusNumber(rawBonus, winningNumbers)
+    } catch (e: IllegalArgumentException) {
+        println(e.message)
+        throw e
+    }
+
+    println("\n입력 확인")
+    println("당첨 번호: $winningNumbers")
+    println("보너스 번호: $bonusNumber")
+
 }
