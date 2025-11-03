@@ -16,11 +16,14 @@ fun main() {
     }
 
     val count = PurchaseValidator.toCount(amount)
+    println()
+    println("${count}개를 구매했습니다.")
 
     // 로또 발행 및 출력
     val tickets = LottoGenerator.createTickets(count)
     tickets.forEach { println(it.values()) }
 
+    // 당첨 번호 입력
     println("\n당첨 번호를 입력해 주세요.")
     val winningNumbers = try {
         val rawWinning = Console.readLine()
@@ -30,7 +33,7 @@ fun main() {
         throw e
     }
 
-    // --- 보너스 번호 입력 ---
+    // 보너스 번호 입력
     println("\n보너스 번호를 입력해 주세요.")
     val bonusNumber = try {
         val rawBonus = Console.readLine()
@@ -40,8 +43,15 @@ fun main() {
         throw e
     }
 
-    println("\n입력 확인")
-    println("당첨 번호: $winningNumbers")
-    println("보너스 번호: $bonusNumber")
+    // 당첨 결과 출력
+    val result = ResultCalculator.evaluate(tickets, winningNumbers, bonusNumber)
+
+    println("\n당첨 통계")
+    println("---")
+    println("3개 일치 (${ResultCalculator.formatPrize(Rank.FIFTH.prize)}) - ${result[Rank.FIFTH]}개")
+    println("4개 일치 (${ResultCalculator.formatPrize(Rank.FOURTH.prize)}) - ${result[Rank.FOURTH]}개")
+    println("5개 일치 (${ResultCalculator.formatPrize(Rank.THIRD.prize)}) - ${result[Rank.THIRD]}개")
+    println("5개 일치, 보너스 볼 일치 (${ResultCalculator.formatPrize(Rank.SECOND.prize)}) - ${result[Rank.SECOND]}개")
+    println("6개 일치 (${ResultCalculator.formatPrize(Rank.FIRST.prize)}) - ${result[Rank.FIRST]}개")
 
 }
