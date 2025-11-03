@@ -15,7 +15,11 @@ fun main() {
         throw e
     }
 
-    // 3) 개수 출력 (다음 단계에서 실제 발행 붙일 예정)
+    // 개수 출력 (다음 단계에서 실제 발행 붙일 예정)
     val count = PurchaseValidator.toCount(amount)
     println("${count}개를 구매했습니다.")
+
+    // 로또 발행 및 출력
+    val tickets = LottoGenerator.createTickets(count)
+    tickets.forEach { println(it.values()) }
 }
